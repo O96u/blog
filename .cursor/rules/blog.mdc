@@ -1,0 +1,32 @@
+---
+description: 博客内容、图片、草稿和静态发布的约束
+globs: content/**/*.md,shared/blog/**/*.ts,scripts/**/*.ts,app/**/*.{vue,ts},nuxt.config.ts
+alwaysApply: true
+---
+
+# 博客规则
+
+- 开始修改前必须先读 `AGENTS.md` 和 `docs/AI_HANDOFF.md`，以免覆盖 Codex 或其他 AI 已完成的工作。
+- 每次修改结束前必须在 `docs/AI_HANDOFF.md` 的最新记录顶部追加一条交接记录，包含目标、修改内容、优化原因、验证结果、失败原因和后续 TODO；没有遗留任务也写“无”。不得删除或重写历史记录，时间使用 `YYYY-MM-DD HH:mm`（Asia/Shanghai）。
+- Frontmatter 字段只使用 `shared/blog/schema.ts` 里的键。日期保持 `YYYY-MM-DD`，不要在构建时改写。
+- 新文章默认草稿。`pnpm content:new --slug <slug> --title <title>`。
+- 标签只用小写英文、数字和连字符。
+- 内部链接必须指向已发布文章、标签页或固定页面。
+- `ts` 和 `js` 代码块必须能通过语法检查。
+- 生产环境遇到 `draft` 不是 `false` 的文章时，让解析失败，不要把正文放进 SQLite dump。
+- 封面、OG 和 RSS 都通过 `resolveImageUrl()`。远程模式缺映射时让构建失败。
+- 搜索页保持 noindex。搜索索引只包含已发布且 `searchable` 不是 `false` 的文章。
+## 传统文章写法（WP / Astro 迁稿，以 `content/posts` 存量为准）
+
+- 文件名可保留中文或带前缀如 `[开源]`；**站内 URL 只认 frontmatter 的 `slug`**，勿用文件名推路径。
+- 存量迁稿 frontmatter 常见：`published`、`image`、`comment`、`category`。**构建时会**经 `normalizeLegacyPostFrontmatter` 映射为 `date`、`cover`、`comments` 并丢弃 `category`；**保存或润色时建议直接写成 schema 键**（与 `shared/blog/schema.ts` 一致）。
+- 标签在文里常写 `WordPress`、`开源` 等；**校验要求**小写英文连字符（如 `wordpress`、`opensource`），规范化会处理常见中文别名。
+- 正文结构习惯（保持这种可读性即可）：
+  - 首段用一两句话说清「这篇是什么、适合谁」；长文可在第一节前加 `---` 作呼吸。
+  - 教程 / 实战：「亮点或目标 → 架构图或表 → 分步操作 → 代码块（须带 `bash`/`ts`/`js` 等语言）→ 收尾仓库或链接」。
+  - 开源推介：个人体验开场 →「先说结论」→ 配图展示 → 对比或场景 → 文末 `::github{repo="org/repo"}`。
+  - 软件 / 资源：特性列表（可带 emoji 小标题）+ 官网或下载说明。
+- 正文扩展与迁移：
+  - 外链图：`https://…` 正逐步改为 `/media/posts/...`（原图在 `images-original/posts/`，须走 `resolveImageUrl()` / 图床 manifest）。
+  - `> [!TIP]` / `> [!WARNING]`（GFM）优先改为本站 MDC：`::callout{type="tip"}` 等（见 `BlogCallout`）。
+  - `::github{repo="…"}`、`[grid]…[/grid]` 来自旧 Astro 主题；在 Nuxt 侧需对应 MDC 组件或暂时改为普通 Markdown 链接/图片，避免留未解析语法。

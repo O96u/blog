@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.3.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm content:check
+      - run: pnpm images:verify
+        env:
+          NUXT_PUBLIC_IMAGE_MODE: local
+      - run: pnpm test
+      - run: pnpm generate
+        env:
+          NUXT_PUBLIC_IMAGE_MODE: local
+          NUXT_SITE_URL: https://blog.example.com
+      - run: pnpm seo:audit
+        env:
+          NUXT_SITE_URL: https://blog.example.com
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+        env:
+          CI: true

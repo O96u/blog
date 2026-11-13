@@ -1,0 +1,17 @@
+[
+  {
+    "from": "/blog/phase-0-proof",
+    "to": "/posts/phase-0-proof",
+    "status": 301
+  },
+  {
+    "from": "/guestbook",
+    "to": "/friends",
+    "status": 301
+  },
+  {
+    "from": "/guestbook/",
+    "to": "/friends",
+    "status": 301
+  }
+]

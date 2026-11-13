@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "images": {
+    "/media/posts/covers/pipeline.webp": {
+      "hash": "3e85a5168cb3385d216deff7f8f22be693f91ba760da7a81afcb444baa6a222e",
+      "width": 1200,
+      "height": 630
+    }
+  }
+}
